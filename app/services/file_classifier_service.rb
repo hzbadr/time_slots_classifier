@@ -14,7 +14,7 @@ class FileClassifierService < BaseService
   def call
     sort_time_slots
     group_time_slots_by_driver
-    # build_activities
+    build_activities
   end
 
   private

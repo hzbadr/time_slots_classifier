@@ -1,6 +1,6 @@
 module Driver
   class Activity
-      
+
     attr_reader :start_time, :end_time
 
     def initialize(slot)
@@ -26,7 +26,7 @@ module Driver
     end
 
     def same_as?(activity)
-      activity.is_a? self.class
+      activity.class == self.class
     end
   end
 end
