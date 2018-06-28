@@ -12,28 +12,12 @@ class FileClassifierService < BaseService
   end
 
   def call
-    sort_time_slots
+    # sort_time_slots
     group_time_slots_by_driver
     build_activities
   end
 
   private
-
-    def build_activities
-      @grouped_time_slots.inject({}) do |accumlator, slots|
-        accumlator.merge({ slots[0] => build_daily_activities_for_driver(slots[1]) })
-      end
-    end
-
-    def build_daily_activities_for_driver(slots)
-      time_slots_grouped_by_date(slots).inject({}) do |accumlator, daily_slots|
-        accumlator.merge({ daily_slots[0] => Driver::ActivityBuilder.build(daily_slots[1], fields) })
-      end
-    end
-
-    def time_slots_grouped_by_date(slots)
-      slots.group_by { |slot| Date.strptime(slot[:timestamp].to_s,'%s') }
-    end
 
     def sort_time_slots
       @time_slots = @time_slots.sort_by { |slot| slot[:timestamp] }
@@ -41,6 +25,28 @@ class FileClassifierService < BaseService
 
     def group_time_slots_by_driver
       @grouped_time_slots = @time_slots.group_by { |slot| slot[:driver_id] }
+    end
+
+    def build_activities
+      t = Time.now
+      activities = {}
+      @grouped_time_slots.map do |date, slots|
+        Thread.new(slots) do |slots|
+          activities.merge!({ date => build_daily_activities_for_driver(slots) })
+        end
+      end.map(&:join)
+      pp Time.now - t
+      activities
+    end
+
+    def build_daily_activities_for_driver(slots)
+      time_slots_grouped_by_date(slots).inject({}) do |accumlator, daily_slots|
+        accumlator.merge({ daily_slots[0] => Driver::ActivityFactory.create(daily_slots[1], fields) })
+      end
+    end
+
+    def time_slots_grouped_by_date(slots)
+      slots.group_by { |slot| Date.strptime(slot[:timestamp].to_s,'%s') }
     end
 
     def fields
