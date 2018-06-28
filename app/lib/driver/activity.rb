@@ -17,12 +17,16 @@ module Driver
       @slot.timestamp
     end
 
+    def driver_id
+      @slot.driver_id
+    end
+
     def merge(activity)
       @end_time = activity.timestamp
     end
 
     def same_as?(activity)
-      activity.is_a? self.class 
+      activity.is_a? self.class
     end
   end
 end
