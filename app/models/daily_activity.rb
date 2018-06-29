@@ -9,6 +9,6 @@ class DailyActivity < ApplicationRecord
   end
 
   def duration
-    Time.at(end_at - start_at).strftime("%H:%M")
+    Time.at(end_at - start_at).utc.to_s(:time)
   end
 end

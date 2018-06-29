@@ -28,16 +28,17 @@ class FileClassifierService < BaseService
     end
 
     def build_daily_activities_for_driver(driver_id, slots)
-      time_slots_grouped_by_date(slots).each do |date, daily_slots|
-        daily_activities = Driver::ActivityFactory.create(daily_slots, fields)
-        daily_activities.each do |activity|
-          DailyActivity.create(driver_id: driver_id, day: date,
-                               start_at: activity.start_at,
-                               end_at: activity.end_at,
-                               activity_type: activity.type
-                              )
+      activities = time_slots_grouped_by_date(slots).map do |date, daily_slots|
+        daily_activities = Driver::ActivityFactory.build(daily_slots, fields)
+        daily_activities.map do |activity|
+          DailyActivity.new(driver_id: driver_id, day: date,
+                            start_at: activity.start_at,
+                            end_at: activity.end_at,
+                            activity_type: activity.type
+                          )
         end
-      end
+      end.flatten
+      DailyActivity.import(activities)
     end
 
     def time_slots_grouped_by_date(slots)

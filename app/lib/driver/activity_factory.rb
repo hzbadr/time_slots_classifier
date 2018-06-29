@@ -2,10 +2,10 @@ require 'ostruct'
 
 module Driver
   class ActivityFactory
-    def self.create(slots, fields)
+    def self.build(slots, fields)
       slots.inject([]) do |activities, slot|
         slot  = OpenStruct.new(slot)
-        activity = Driver::ActivityFactory.new(slot, fields).create
+        activity = Driver::ActivityFactory.new(slot, fields).build
         prev_activity = activities.last
 
         if prev_activity && prev_activity.same_as?(activity)
@@ -25,7 +25,7 @@ module Driver
       @fields = fields
     end
 
-    def create
+    def build
       activity_class.new(slot)
     end
 
