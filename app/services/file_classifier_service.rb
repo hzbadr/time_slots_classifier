@@ -12,37 +12,19 @@ class FileClassifierService < BaseService
   end
 
   def call
-    group_time_slots_by_driver
-    build_activities
+    create_activities
+    true
   end
 
   private
-    def group_time_slots_by_driver
-      @grouped_time_slots = @time_slots.group_by { |slot| slot[:driver_id] }
-    end
-
-    def build_activities
-      @grouped_time_slots.each do |driver_id, slots|
-        build_daily_activities_for_driver(driver_id, slots)
+    def create_activities
+      group_time_slots_by_driver.each do |driver_id, slots|
+        CreateDriverActivitiesService.call(driver_id, slots, fields)
       end
     end
 
-    def build_daily_activities_for_driver(driver_id, slots)
-      activities = time_slots_grouped_by_date(slots).map do |date, daily_slots|
-        daily_activities = Driver::ActivityFactory.build(daily_slots, fields)
-        daily_activities.map do |activity|
-          DailyActivity.new(driver_id: driver_id, day: date,
-                            start_at: activity.start_at,
-                            end_at: activity.end_at,
-                            activity_type: activity.type
-                          )
-        end
-      end.flatten
-      DailyActivity.import(activities)
-    end
-
-    def time_slots_grouped_by_date(slots)
-      slots.group_by { |slot| Date.strptime(slot[:timestamp].to_s,'%s') }
+    def group_time_slots_by_driver
+      @grouped_time_slots = @time_slots.group_by { |slot| slot[:driver_id] }
     end
 
     def fields

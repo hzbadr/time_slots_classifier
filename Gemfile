@@ -47,3 +47,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'ruby-geometry', require: 'geometry'
 gem 'activerecord-import'
 gem 'sidekiq'
+gem 'pg'

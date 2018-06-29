@@ -12,8 +12,11 @@
 
 ActiveRecord::Schema.define(version: 2018_06_29_161728) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "daily_activities", force: :cascade do |t|
-    t.integer "driver_id"
+    t.bigint "driver_id"
     t.date "day"
     t.time "start_at"
     t.time "end_at"

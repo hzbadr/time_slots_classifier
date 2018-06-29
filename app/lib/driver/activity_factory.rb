@@ -42,8 +42,6 @@ module Driver
         end
       elsif slot.speed > 5
         Driving
-      else
-        Driving # I should not handle this case!
       end
     end
   end
