@@ -17,6 +17,14 @@ module Driver
       @slot.timestamp
     end
 
+    def start_at
+      Time.strptime(start_time.to_s,'%s')
+    end
+
+    def end_at
+      Time.strptime(end_time.to_s,'%s')
+    end
+
     def driver_id
       @slot.driver_id
     end
@@ -28,5 +36,10 @@ module Driver
     def same_as?(activity)
       activity.class == self.class
     end
+
+    def type
+      self.class.name.split("::").last
+    end
+
   end
 end

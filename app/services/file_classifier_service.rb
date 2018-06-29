@@ -22,16 +22,21 @@ class FileClassifierService < BaseService
     end
 
     def build_activities
-      @grouped_time_slots.inject({}) do |accumlator, slots_group|
-        driver_id, slots = slots_group
-        accumlator.merge({ driver_id => build_daily_activities_for_driver(slots) })
+      @grouped_time_slots.each do |driver_id, slots|
+        build_daily_activities_for_driver(driver_id, slots)
       end
     end
 
-    def build_daily_activities_for_driver(slots)
-      time_slots_grouped_by_date(slots).inject({}) do |accumlator, daily_slots|
-        date, slots = daily_slots
-        accumlator.merge({ date => Driver::ActivityFactory.create(slots, fields) })
+    def build_daily_activities_for_driver(driver_id, slots)
+      time_slots_grouped_by_date(slots).each do |date, daily_slots|
+        daily_activities = Driver::ActivityFactory.create(daily_slots, fields)
+        daily_activities.each do |activity|
+          DailyActivity.create(driver_id: driver_id, day: date,
+                               start_at: activity.start_at,
+                               end_at: activity.end_at,
+                               activity_type: activity.type
+                              )
+        end
       end
     end
 
