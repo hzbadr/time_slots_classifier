@@ -26,6 +26,6 @@ class CreateDriverActivitiesService < BaseService
     end
 
     def time_slots_grouped_by_date
-      slots.group_by { |slot| Date.strptime( slot["timestamp"].to_s,'%s') }
+      slots.group_by { |slot| Date.strptime(slot["timestamp"].to_s,'%s') }
     end
 end

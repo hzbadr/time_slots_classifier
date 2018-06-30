@@ -4,6 +4,8 @@ module Driver
   class ActivityFactory
     #TODO HZ: need a refactor here.
     def self.build(slots, fields, action_class=Driver::ActionClass)
+      slots = slots.sort_by { |slot| slot["timestamp"] }
+
       slots.inject([]) do |activities, slot|
         activity = Driver::ActivityFactory.new(slot, fields, action_class).build
         prev_activity = activities.last

@@ -20,6 +20,6 @@ class FileClassifierService < BaseService
     end
 
     def group_time_slots_by_driver
-      @time_slots.group_by { |slot| slot[:driver_id] }
+      @time_slots.group_by { |slot| slot["driver_id"] }
     end
 end
