@@ -2,13 +2,13 @@ require 'ostruct'
 
 module Driver
   class ActivityFactory
-    def self.build(slots, fields)
+    #TODO HZ: need a refactor here.
+    def self.build(slots, fields, action_class=Activity::ActionClass)
       slots.inject([]) do |activities, slot|
-        slot  = OpenStruct.new(slot)
-        activity = Driver::ActivityFactory.new(slot, fields).build
+        activity = Driver::ActivityFactory.new(slot, fields, action_class).build
         prev_activity = activities.last
 
-        if prev_activity && prev_activity.same_as?(activity)
+        if activity.same_as?(prev_activity)
           prev_activity.merge(activity)
         else
           activities << activity
@@ -20,9 +20,10 @@ module Driver
 
     attr_reader :slot, :fields
 
-    def initialize(slot, fields)
-      @slot = slot
+    def initialize(slot, fields, action_class)
+      @slot = OpenStruct.new(slot)
       @fields = fields
+      @action_class = action_class
     end
 
     def build
@@ -34,15 +35,7 @@ module Driver
     end
 
     def activity_class
-      if in_field?
-        if slot.speed > 1
-          Cultivating
-        else
-          Repairing
-        end
-      elsif slot.speed > 5
-        Driving
-      end
+      action_class.new(slot).activity_class
     end
   end
 
