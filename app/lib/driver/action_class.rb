@@ -1,7 +1,8 @@
 module Driver
   class ActionClass
-    def initialize(slot)
+    def initialize(slot, fields)
       @slot = slot
+      @fields = fields
     end
 
     def activity_class
@@ -15,5 +16,10 @@ module Driver
         Driving
       end
     end
+
+    private
+      def in_field?
+        @fields.any? { |field| field.surrounding?(@slot.latitude, @slot.longitude) }
+      end
   end
 end

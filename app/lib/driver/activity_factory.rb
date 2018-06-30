@@ -3,7 +3,7 @@ require 'ostruct'
 module Driver
   class ActivityFactory
     #TODO HZ: need a refactor here.
-    def self.build(slots, fields, action_class=Activity::ActionClass)
+    def self.build(slots, fields, action_class=Driver::ActionClass)
       slots.inject([]) do |activities, slot|
         activity = Driver::ActivityFactory.new(slot, fields, action_class).build
         prev_activity = activities.last
@@ -30,13 +30,8 @@ module Driver
       activity_class.new(slot)
     end
 
-    def in_field?
-      fields.any? { |field| field.surrounding?(slot.latitude, slot.longitude) }
-    end
-
     def activity_class
-      action_class.new(slot).activity_class
+      @action_class.new(slot, fields).activity_class
     end
   end
-
 end
